@@ -1,14 +1,18 @@
+![logo accoderie des bauges](https://laccoderie.herokuapp.com/images/Screenshot-site-accorderie.png)
+
 # l'accorderie
 
 Formulaire d'enregistrement d'heures de service entre Accordeurs.
 
 # Installation avec le terminal
 
-- Installer Git (git) https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
-- `Git clone git@github.com:leanderfuchs/accorderie.git`
+- Installer [GIT](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- Lancer la commande suivante : `Git clone git@github.com:leanderfuchs/accorderie.git`
 
 ## Démarrer le server local
 - npm run start
 
 ## Accéder au site en local avec votre navigateur
 http://localhost:3000/
+
+![This is an image](https://laccoderie.herokuapp.com/images/logo.png)
