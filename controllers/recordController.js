@@ -115,6 +115,7 @@ exports.addRecord = function (req, res, body) {
           const mail = {
             from: 'coeurdesbauges@accorderie.fr',
             to: beneficiary,
+
             subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider +' le '+ date ,
 
             html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>'+ beneficiary +'</b> rendu par <b>'+ provider +'</b> ,</p><p> pour le service: <p><b>"'+ description +'"</b></p>, le <b>'+ date +'</b>, dont la durée est de <b>'+ hours +'h. '+ minutes +'min.</b></p>'
@@ -148,6 +149,7 @@ exports.addRecord = function (req, res, body) {
           const mail = {
             from: 'coeurdesbauges@accorderie.fr',
             to: provider,
+            
             subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider +' le '+ date ,
 
             html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>'+ beneficiary +'</b> rendu par <b>'+ provider +'</b> ,</p><p> pour le service: <p><b>"'+ description +'"</b></p>, le <b>'+ date +'</b>, dont la durée est de <b>'+ hours +'h. '+ minutes +'min.</b></p>'
