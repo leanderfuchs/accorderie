@@ -14,5 +14,3 @@ Formulaire d'enregistrement d'heures de service entre Accordeurs.
 
 ## Accéder au site en local avec votre navigateur
 http://localhost:3000/
-
-![This is an image](https://laccoderie.herokuapp.com/images/logo.png)
