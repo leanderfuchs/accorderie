@@ -4,6 +4,9 @@ const { validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
 const mailjetTransport = require('nodemailer-mailjet-transport');
 
+var path = require('path');
+const FILES_DIR = path.resolve('./public/files');;
+
 exports.addRecord = function (req, res, body) 
 {
     const errors = validationResult(req);
@@ -26,7 +29,7 @@ exports.addRecord = function (req, res, body)
         user_ip: req.socket.remoteAddress
     };
 
-    fs.readFile(process.env.FILES_FOLDER + 'registrations.json', 'utf8', (err, data) => {
+    fs.readFile( FILES_DIR + '/registrations.json', 'utf8', (err, data) => {
         if (err) {
             console.error(err);
             return res.sendStatus(400).send({ error: 'Désolé, une erreur de lecture est survenue. Vous pouvez recommencer ou nous appeler au 0749702058 !' })
@@ -36,7 +39,7 @@ exports.addRecord = function (req, res, body)
         const file = JSON.parse(data);
         file.push(newRecord);
 
-        fs.writeFile(process.env.FILES_FOLDER + 'registrations.json', JSON.stringify(file), err => {
+        fs.writeFile( FILES_DIR + '/registrations.json', JSON.stringify(file), err => {
             if (err) {
                 console.error(err);
                 return res.sendStatus(400).render('index').send({ error: 'Désolé, une erreur d\'enregistrement est survenue. Vous pouvez recommencer ou nous appeler au 0749702058 !' })
@@ -94,8 +97,8 @@ exports.addRecord = function (req, res, body)
             response["minutes"] = '';
             response["reference"] = '';
             
-            res.redirect('/'); 
-            //return res.render('index', {response : response, msg: 'Votre chèque a été ajouté avec succès. Un email de confirmation a été envoyé à la boite mail des protagonistes ainsi qu\'à celle de l\'accorderie.'});
+            // res.redirect('/'); 
+            return res.render('index', {response : response, msg: 'Votre chèque a été ajouté avec succès. Un email de confirmation a été envoyé à la boite mail des protagonistes ainsi qu\'à celle de l\'accorderie.'});
         });
     });
 
