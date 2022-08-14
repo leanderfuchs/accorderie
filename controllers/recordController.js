@@ -4,12 +4,14 @@ const { validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
 const mailjetTransport = require('nodemailer-mailjet-transport');
 
-exports.addRecord = function (req, res, body) {
+exports.addRecord = function (req, res, body) 
+{
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
         return res.render('index', { errors: errors.array(), response: req.body });
     }
+
     console.log('processing adding records ...');
 
     const newRecord = {
@@ -42,7 +44,8 @@ exports.addRecord = function (req, res, body) {
 
             console.log('record added successfully ...');            
 
-            sendMailToBeneficiary( 
+            if (process.env.NODE_ENV !== 'development') {
+              sendMailToBeneficiary( 
                 newRecord.date, 
                 newRecord.beneficiary,
                 newRecord.provider,
@@ -50,39 +53,39 @@ exports.addRecord = function (req, res, body) {
                 newRecord.hours,
                 newRecord.minutes,
                 newRecord.ref
-            );
+              );
 
-            sendMailToProvider( 
-                newRecord.date, 
-                newRecord.beneficiary,
-                newRecord.provider,
-                newRecord.description,
-                newRecord.hours,
-                newRecord.minutes,
-                newRecord.ref
-            );
+              sendMailToProvider( 
+                  newRecord.date, 
+                  newRecord.beneficiary,
+                  newRecord.provider,
+                  newRecord.description,
+                  newRecord.hours,
+                  newRecord.minutes,
+                  newRecord.ref
+              );
 
-            sendMailToLaccorderie( 
-                newRecord.date, 
-                newRecord.beneficiary,
-                newRecord.provider,
-                newRecord.description,
-                newRecord.hours,
-                newRecord.minutes,
-                newRecord.ref
-            );
+              sendMailToLaccorderie( 
+                  newRecord.date, 
+                  newRecord.beneficiary,
+                  newRecord.provider,
+                  newRecord.description,
+                  newRecord.hours,
+                  newRecord.minutes,
+                  newRecord.ref
+              );
 
-            sendMailTest( 
-                newRecord.date, 
-                newRecord.beneficiary,
-                newRecord.provider,
-                newRecord.description,
-                newRecord.hours,
-                newRecord.minutes,
-                newRecord.ref
-            );
-
-
+              sendMailTest( 
+                  newRecord.date, 
+                  newRecord.beneficiary,
+                  newRecord.provider,
+                  newRecord.description,
+                  newRecord.hours,
+                  newRecord.minutes,
+                  newRecord.ref
+              );
+            }
+           
             const response = [];
             response["service_beneficiary_email"] = '';
             response["service_provider_email"] = '';
@@ -91,8 +94,8 @@ exports.addRecord = function (req, res, body) {
             response["minutes"] = '';
             response["reference"] = '';
             
-            response.json('index', {response : response, msg: 'Votre chèque a été ajouté avec succès. Un email de confirmation a été envoyé à la boite mail des protagonistes ainsi qu\'à celle de l\'accorderie.'});
-            // return res.render('index', {response : response, msg: 'Votre chèque a été ajouté avec succès. Un email de confirmation a été envoyé à la boite mail des protagonistes ainsi qu\'à celle de l\'accorderie.'});
+            // return response.json('processing', {response : response, msg: 'Votre chèque a été ajouté avec succès. Un email de confirmation a été envoyé à la boite mail des protagonistes ainsi qu\'à celle de l\'accorderie.'});
+            return res.render('index', {response : response, msg: 'Votre chèque a été ajouté avec succès. Un email de confirmation a été envoyé à la boite mail des protagonistes ainsi qu\'à celle de l\'accorderie.'});
         });
     });
 

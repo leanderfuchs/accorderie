@@ -24,7 +24,7 @@ block content
           if locals.error
             .alert.alert-danger(role="alert") #{error}
 
-          form(name="create_time" method="post").row.g-5
+          form(name="create_time" method="post", action="processing").row.g-5
             
             .col-md-6
               label(for="service-beneficiary-email") Bénéficiaire du service rendu

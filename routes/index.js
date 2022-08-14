@@ -19,7 +19,7 @@ router.get('/', function(req, res, next) {
 });
 
 /* POST home page. */
-router.post('/', 
+router.post('/processing', 
   body('service_beneficiary_email')
       .notEmpty()
       .isEmail()
