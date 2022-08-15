@@ -30,11 +30,36 @@ exports.addRecordController = function (req, res, body)
         user_ip: req.socket.remoteAddress
     };
 
-    fs.readFile( FILES_DIR + '/registrations.json', 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            return res.sendStatus(400).send({ error: 'Désolé, une erreur de lecture est survenue. Vous pouvez recommencer ou nous appeler au 0749702058 !' })
+  
+    if (fs.existsSync( FILES_DIR + '/registrations.json')) 
+    {
+      console.log('file exists');
+    } 
+    else 
+    {
+      console.log('file missing');
+
+      fs.writeFile(FILES_DIR + '/registrations.json', '', function(err) 
+      {
+        if(err) {
+            console.log(err);
         }
+        console.log("File saved!");
+
+        fs.appendFile( FILES_DIR + '/registrations.json', '[]', err => 
+        {
+          if (err) 
+          {
+            console.error(err);
+          }
+          console.log("File content created");
+        });
+      });
+    }
+
+    fs.readFile( FILES_DIR + '/registrations.json', 'utf8', (err, data) => 
+    {
+
         console.log('file read successfully ...');
 
         const file = JSON.parse(data);
@@ -108,7 +133,7 @@ exports.addRecordController = function (req, res, body)
             response["hours"] = '';
             response["minutes"] = '';
             response["reference"] = '';
-            
+
             return res.render('index', {response : response, msg: 'Votre chèque a été ajouté avec succès. Un email de confirmation a été envoyé à la boite mail des protagonistes ainsi qu\'à celle de l\'accorderie.'});
         });
     });
