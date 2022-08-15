@@ -40,8 +40,6 @@ exports.recordListController = function (req, res, body)
     } 
     else 
     {
-
-
       fs.writeFile(FILES_DIR + '/registrations.json', '', function(err) 
       {
         if(err) {
@@ -58,7 +56,7 @@ exports.recordListController = function (req, res, body)
           console.log("File content created");
         });
       });
-      
+
       data = [];
       file = [];
 
