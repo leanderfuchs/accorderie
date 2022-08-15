@@ -1,120 +1,125 @@
+
 extends layout.jade
 
 block content
 
-  header.pb-3.mb-4
-  body.container-sm.p-3.mx-auto
-    .container-md.mb-5
-      .col-md-6.mx-auto
-        a(href="https://www.accorderie.fr/coeurdesbauges/", target="_blank", rel="noopener noreferrer") 
-          img(src="/images/logo.png" alt="logo de l'accorderie").img-fluid
-    .bg-light.rounded-3.border-top
-      .container-fluid.py-5.p-md-5
-          
-          .fw-bold.text-center.mb-5.display-6 Nouveau chèque temps
-          
-          ul.errors.mb-5
-            if errors
-                each error, i in errors
-                    li.alert.alert-danger #{error.msg}
+  body.m-0.p-3
+    .container.my-4.mx-auto
+        .col-6.mx-auto
+          a(href="https://www.accorderie.fr/coeurdesbauges/", target="_blank", rel="noopener noreferrer") 
+            img(src="/images/logo.png" alt="logo de l'accorderie").img-fluid
 
-          if locals.msg
-            .alert.alert-success(role="alert") #{msg}
+    .container.bg-light.rounded-3.border-top.p-4
+      .col-12.my-4
+        .fw-bold.text-center.mb-5.display-6 Nouveau chèque temps
+        
+        ul.errors.mb-5
+          if errors
+              each error, i in errors
+                  li.alert.alert-danger #{error.msg}
 
-          if locals.error
-            .alert.alert-danger(role="alert") #{error}
+        if locals.msg
+          .alert.alert-success(role="alert") #{msg}
 
-          form(name="create_time" method="post", action="processing").row.g-5
-            
-            .col-md-6
-              label(for="service-beneficiary-email") Bénéficiaire du service rendu
-              div.input-group.required
-                span.input-group-text#service-beneficiary-email @
-                input(
-                  type="text", 
-                  name="service_beneficiary_email", 
-                  placeholder="bénéficiaire@email.com", 
-                  aria-label="Username", 
-                  aria-describedby="service-beneficiary-email",
-                  value="#{response.service_beneficiary_email}"
-                  required
-                ).form-control
-            
-            .col-md-6
-              label(for="service-provider-email") Service rendu par:
-              div.input-group.required
-                span.input-group-text#service-provider-email @
-                input(
-                  type="text", 
-                  name="service_provider_email", 
-                  placeholder="accordeur@email.com", 
-                  aria-label="Username", 
-                  aria-describedby="service-provider-email",
-                  value="#{response.service_provider_email}"
-                  required
-                ).form-control
-            
-            .col-md-12
-              label(for="service-description") Description du service
-              .input-group.required
-                textarea(
-                  name="service_description", 
-                  placeholder="Écrivez une ligne ou deux pour retrouver plus tard de quoi il s'agissait.", 
-                  aria-label="service-description", 
-                  aria-describedby="service-description",
-                  required
-                ).form-control
-                  |#{response.service_description}
+        if locals.error
+          .alert.alert-danger(role="alert") #{error}
 
-            .col-md-6
-              label(for="service-duration") Payez contre ce chèque ( en durée )
-              .input-group.required
-                select(
-                  id="hours",
-                  name="hours",
-                  aria-label="service-duration-hours",
-                  value="#{response.hours}"
-                ).form-control
-                   each val in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39]
-                    option(selected=response.hours==val value="#{val}") #{val}
+      form(name="create_time" method="post", action="processing").row.g-5
+        
+        .col-md-6.col-sm-12
+          label(for="service-beneficiary-email") Bénéficiaire du service rendu
+          div.input-group.required
+            span.input-group-text#service-beneficiary-email @
+            input(
+              type="text", 
+              name="service_beneficiary_email", 
+              placeholder="bénéficiaire@email.com", 
+              aria-label="Username", 
+              aria-describedby="service-beneficiary-email",
+              value="#{response.service_beneficiary_email}"
+              required
+            ).form-control
+        
+        .col-md-6.col-sm-12
+          label(for="service-provider-email") Service rendu par:
+          div.input-group.required
+            span.input-group-text#service-provider-email @
+            input(
+              type="text", 
+              name="service_provider_email", 
+              placeholder="accordeur@email.com", 
+              aria-label="Username", 
+              aria-describedby="service-provider-email",
+              value="#{response.service_provider_email}"
+              required
+            ).form-control
+      
+        
+        .col-md-12
+          label(for="service-description") Description du service
+          .input-group.required
+            textarea(
+              name="service_description", 
+              placeholder="Écrivez une ligne ou deux pour retrouver plus tard de quoi il s'agissait.", 
+              aria-label="service-description", 
+              aria-describedby="service-description",
+              required
+            ).form-control
+              |#{response.service_description}
+      
 
-                span.input-group-text heures
-                select(
-                  name="minutes",
-                  aria-label="service-duration-minutes",
-                  value="#{response.minutes}"
-                  required
-                ).form-control
-                  each val in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59]
-                    option(selected=response.minutes==val value="#{val}") #{val}
-                span.input-group-text minutes
-            
-            .col-md-6
-              label(for="reference") Référence
-              .input-group
-                span(id="basic-addon1").input-group-text Ref #
-                input(
-                  type="text",
-                  placeholder="optionnel",
-                  name="reference",
-                  aria-label="reference",
-                  aria-describedby="reference"
-                  value="#{response.reference}"            
-                  ).form-control
+        .col-md-6.col-sm-12
+          label(for="service-duration") Payez contre ce chèque ( en durée )
+          .input-group.required
+            select(
+              id="hours",
+              name="hours",
+              aria-label="service-duration-hours",
+              value="#{response.hours}"
+            ).form-control
+              each val in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39]
+                option(selected=response.hours==val value="#{val}") #{val}
 
-            .d-grid.gap-2.col-6.mx-auto
-              button(type="submit").btn.btn-primary Envoyer
-  .container.text-center.my-5
-    iframe(
-      max-width="560",
-      max-height="315",
-      src="https://www.youtube.com/embed/p5XLgtJ7ri4",
-      title="YouTube video player",
-      frameborder="0",
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
-      allowfullscreen
-    )
-  .pt-3.xt-4.text-muted.text-center.small
-    p:  a(href="http://example.com" ,target="_blank") L'accorderie Mentions légales
-          span &copy; l’accorderie |
-          a(href="https://www.accorderie.fr/coeurdesbauges/contact/" ,target="_blank") Contact
+            span.input-group-text heures
+            select(
+              name="minutes",
+              aria-label="service-duration-minutes",
+              value="#{response.minutes}"
+              required
+            ).form-control
+              each val in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59]
+                option(selected=response.minutes==val value="#{val}") #{val}
+            span.input-group-text minutes
+      
+        .col-md-6.col-sm-12
+          label(for="reference") Référence
+          .input-group
+            span(id="basic-addon1").input-group-text Ref #
+            input(
+              type="text",
+              placeholder="optionnel",
+              name="reference",
+              aria-label="reference",
+              aria-describedby="reference"
+              value="#{response.reference}"            
+              ).form-control
+      
+        .col-12
+          .d-grid.gap-2.col-6.mx-auto
+            button(type="submit").btn.btn-primary Envoyer
+
+              
+    .container.text-center.my-5
+      iframe(
+        max-width="560",
+        max-height="315",
+        src="https://www.youtube.com/embed/p5XLgtJ7ri4",
+        title="YouTube video player",
+        frameborder="0",
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+        allowfullscreen
+      )
+    .pt-3.xt-4.text-muted.text-center.small
+      p:  a(href="http://example.com" ,target="_blank") L'accorderie Mentions légales
+            span &copy; l’accorderie |
+            a(href="https://www.accorderie.fr/coeurdesbauges/contact/" ,target="_blank") Contact

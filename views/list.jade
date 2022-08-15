@@ -2,35 +2,34 @@ extends layout.jade
 
 block content
 
-  header.pb-3.mb-4
-    .h1.text-center Registration list
-    .text-center.my-5
-      button.btn.btn-primary(onclick="downloadCsv( #{data} )") Téléchager
   body
-  
-    .table-responsive
-      table.table.table-hover
-        thead
-          tr
-            th(scope="col") #
-            th(scope="col") Date
-            th(scope="col") Beneficiary
-            th(scope="col") provider
-            th(scope="col") description
-            th(scope="col") Duration
-            th(scope="col") ref
-            th(scope="col") user agent
-            th(scope="col") user ip
-        tbody
-          each record, i in records
-            tr
-              th(scope="row") #{record.id}
-              td() #{record.date}
-              td() #{record.beneficiary}
-              td() #{record.provider}
-              td() #{record.description}
-              td() #{record.hours}:#{record.minutes} 
-              td() #{record.ref}
-              td() #{record.user_agent}
-              td() #{record.user_ip} 
+    header.py-2
+      .h1.text-center Registration list
+      .text-center.my-4
+        button.btn.btn-primary(onclick="downloadCsv( #{data} )") Téléchager
+    
+    each record, i in records
+      .card(style="width: 18rem;").bg-light
+        .card-header
+          .small.float-end Le #{record.date}
+          .h5.bold # #{record.id}
+          
+        .card-body
+          if(record.ref)
+            .small.float-end ref: #{record.ref}
+          
+          .p De : 
+            span.bold #{record.provider}
+          .p A : 
+            span.bold #{record.beneficiary}
+          .p Durée : 
+            span.bold #{record.hours}:#{record.minutes}
+            hr
+          .p description : 
+          .card.p-2.my-3
+            .p #{record.description}
 
+        .card-footer.text-muted
+          .small user ip: #{record.user_ip}
+          hr
+          .small user agent: #{record.user_agent}
