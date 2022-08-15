@@ -7,7 +7,7 @@ const mailjetTransport = require('nodemailer-mailjet-transport');
 var path = require('path');
 const FILES_DIR = path.resolve('./public/files');;
 
-exports.addRecord = function (req, res, body) 
+exports.addRecordController = function (req, res, body) 
 {
     const errors = validationResult(req);
 
@@ -18,6 +18,7 @@ exports.addRecord = function (req, res, body)
     console.log('processing adding records ...');
 
     const newRecord = {
+        id : null,
         date: format('dd/mm/yyyy hh:mm:ss', new Date()),
         beneficiary: req.body.service_beneficiary_email,
         provider: req.body.service_provider_email,
@@ -37,6 +38,17 @@ exports.addRecord = function (req, res, body)
         console.log('file read successfully ...');
 
         const file = JSON.parse(data);
+        
+        var lastRecord = file[Object.keys(file)[Object.keys(file).length - 1]];
+        if( !lastRecord ) 
+        {
+          newRecord.id = 1;
+        } 
+        else 
+        {
+          newRecord.id = lastRecord.id +1;
+        }
+
         file.push(newRecord);
 
         fs.writeFile( FILES_DIR + '/registrations.json', JSON.stringify(file), err => {
@@ -97,7 +109,6 @@ exports.addRecord = function (req, res, body)
             response["minutes"] = '';
             response["reference"] = '';
             
-            // res.redirect('/'); 
             return res.render('index', {response : response, msg: 'Votre chèque a été ajouté avec succès. Un email de confirmation a été envoyé à la boite mail des protagonistes ainsi qu\'à celle de l\'accorderie.'});
         });
     });
@@ -130,7 +141,6 @@ exports.addRecord = function (req, res, body)
           
           try {
             const info = transport.sendMail(mail);
-            console.log(info);
           } catch (err) {
             console.error(err);
           }
@@ -164,7 +174,6 @@ exports.addRecord = function (req, res, body)
           
           try {
             const info = transport.sendMail(mail);
-            console.log(info);
           } catch (err) {
             console.error(err);
           }
@@ -197,7 +206,6 @@ exports.addRecord = function (req, res, body)
           
           try {
             const info = transport.sendMail(mail);
-            console.log(info);
           } catch (err) {
             console.error(err);
           }
@@ -231,7 +239,6 @@ exports.addRecord = function (req, res, body)
           
           try {
             const info = transport.sendMail(mail);
-            console.log(info);
           } catch (err) {
             console.error(err);
           }

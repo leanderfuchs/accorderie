@@ -3,7 +3,8 @@ var router = express.Router();
 var app = express();
 const { body } = require('express-validator');
 
-const { addRecord } = require('../controllers/recordController.js');
+const { addRecordController } = require('../controllers/recordController.js');
+const { recordListController } = require('../controllers/recordListController.js');
 
 const response = [];
 response["service_beneficiary_email"] = '';
@@ -20,12 +21,12 @@ router.get('/', function(req, res, next) {
 
 /* POST home page. */
 router.post('/processing', 
-  body('service_beneficiary_email')
+    body('service_beneficiary_email')
       .notEmpty()
       .isEmail()
       .withMessage('L\'email du bénéficiaire est incorrect'),
 
-  body('service_provider_email')
+    body('service_provider_email')
       .notEmpty()
       .isEmail()
       .withMessage('L\'email de la personne ayant rendu le service est incorrect.')
@@ -37,16 +38,16 @@ router.post('/processing',
         };
       }),
 
-  body('service_description')
+    body('service_description')
       .notEmpty()
       .isLength({ min: 10 })
       .withMessage('La description doit contenir au moins 10 caractères.'),
 
-  body('hours')
+    body('hours')
       .isFloat({ min: 0, max: 39 })
       .withMessage('L\'heure doit être un numéro entre 0 et 39.'),
 
-  body('minutes')
+    body('minutes')
       .notEmpty()
       .isFloat({ min: 0, max: 59 })
       .custom((value,{req}) => {
@@ -57,11 +58,14 @@ router.post('/processing',
         };
       }),
 
-  body('reference')
+    body('reference')
       .isString()
       .withMessage('La référence doit être composée de lettres et de chiffres.'),
 
-  addRecord
+    addRecordController
 );
+
+/* GET home page. */
+router.get('/list-accorderie--records-list-for-admins',  recordListController);
 
 module.exports = router;
