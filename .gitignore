@@ -58,4 +58,4 @@ node_modules/
 .DS_Store
 
 #registrations file
-registrations.json
+registrations.*
