@@ -114,7 +114,9 @@ exports.addRecordController = function (req, res, body)
                   newRecord.minutes,
                   newRecord.ref
               );
+            }
 
+            if (process.env.NODE_ENV == 'development') {
               sendMailTest( 
                   newRecord.date, 
                   newRecord.beneficiary,
@@ -151,12 +153,12 @@ exports.addRecordController = function (req, res, body)
 
         const transport = nodemailer.createTransport(mailjetTransport({
             auth: {
-              apiKey: '3868dda2ada63a06e420e1b0b6aad40c',
-              apiSecret: '285a90d758a36377d1ce69b057772c2c'
+              apiKey: process.env.MAILJETAPIKEY,
+              apiSecret: process.env.MAILJETSECRETKEY
             }
           }));
           const mail = {
-            from: 'coeurdesbauges@accorderie.fr',
+            from: process.env.EMAILACCODERIE,
             to: beneficiary,
 
             subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider +' le '+ date ,
@@ -184,12 +186,12 @@ exports.addRecordController = function (req, res, body)
 
         const transport = nodemailer.createTransport(mailjetTransport({
             auth: {
-              apiKey: '3868dda2ada63a06e420e1b0b6aad40c',
-              apiSecret: '285a90d758a36377d1ce69b057772c2c'
+              apiKey: process.env.MAILJETAPIKEY,
+              apiSecret: process.env.MAILJETSECRETKEY
             }
           }));
           const mail = {
-            from: 'coeurdesbauges@accorderie.fr',
+            from: process.env.EMAILACCODERIE,
             to: provider,
             
             subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider +' le '+ date ,
@@ -217,13 +219,13 @@ exports.addRecordController = function (req, res, body)
 
         const transport = nodemailer.createTransport(mailjetTransport({
             auth: {
-              apiKey: '3868dda2ada63a06e420e1b0b6aad40c',
-              apiSecret: '285a90d758a36377d1ce69b057772c2c'
+              apiKey: process.env.MAILJETAPIKEY,
+              apiSecret: process.env.MAILJETSECRETKEY
             }
           }));
           const mail = {
-            from: 'coeurdesbauges@accorderie.fr',
-            to: 'coeurdesbauges@accorderie.fr',
+            from: process.env.EMAILACCODERIE,
+            to: process.env.EMAILACCODERIE,
             subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider +' le '+ date ,
 
             html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>'+ beneficiary +'</b> rendu par <b>'+ provider +'</b> ,</p><p> pour le service: <p><b>"'+ description +'"</b></p>, le <b>'+ date +'</b>, dont la durée est de <b>'+ hours +'h. '+ minutes +'min.</b></p>'
@@ -249,24 +251,22 @@ exports.addRecordController = function (req, res, body)
 
         const transport = nodemailer.createTransport(mailjetTransport({
             auth: {
-              apiKey: '3868dda2ada63a06e420e1b0b6aad40c',
-              apiSecret: '285a90d758a36377d1ce69b057772c2c'
+              apiKey: process.env.MAILJETAPIKEY,
+              apiSecret: process.env.MAILJETSECRETKEY
             }
           }));
           const mail = {
-            from: 'leander.fuchs@webexpertbusiness.net',
-            to: 'leanderfuchs@gmail.com',
-            
+            from: process.env.EMAILLEANDER,
+            to: process.env.EMAILLEANDER,
             subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider +' le '+ date ,
 
             html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>'+ beneficiary +'</b> rendu par <b>'+ provider +'</b> ,</p><p> pour le service: <p><b>"'+ description +'"</b></p>, le <b>'+ date +'</b>, dont la durée est de <b>'+ hours +'h. '+ minutes +'min.</b></p>'
           };
-          
+
           try {
             const info = transport.sendMail(mail);
           } catch (err) {
             console.error(err);
           }
     };
-
 };
