@@ -3,270 +3,257 @@ var format = require('date-format');
 const { validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
 const mailjetTransport = require('nodemailer-mailjet-transport');
+const dotenv = require('dotenv');
+const { Client } = require('pg')
 
-var path = require('path');
-const FILES_DIR = path.resolve('./public/files');;
+dotenv.config();
 
-exports.addRecordController = function (req, res, body) 
-{
-    const errors = validationResult(req);
+const client = new Client({
+  user: process.env.PGUSER,
+  host: process.env.PGHOST,
+  database: process.env.PGDATABASE,
+  password: process.env.PGPASSWORD,
+  port: process.env.PGPORT
+});
 
-    if (!errors.isEmpty()) {
-        return res.render('index', { errors: errors.array(), response: req.body });
-    }
+client.connect()
 
-    console.log('processing adding records ...');
+exports.addRecordController = function (req, res, body) {
 
-    const newRecord = {
-        id : null,
-        date: format('dd/mm/yyyy hh:mm:ss', new Date()),
-        beneficiary: req.body.service_beneficiary_email,
-        provider: req.body.service_provider_email,
-        description: req.body.service_description,
-        hours: req.body.hours,
-        minutes: req.body.minutes,
-        ref: req.body.reference,
-        user_agent: req.headers['user-agent'],
-        user_ip: req.socket.remoteAddress
-    };
+  const errors = validationResult(req);
 
-  
-    if (fs.existsSync( FILES_DIR + '/registrations.json')) 
+  if (!errors.isEmpty()) {
+    return res.render('index', { errors: errors.array(), response: req.body });
+  }
+
+  console.log('processing adding records ...');
+
+  const newRecord = {
+    id: null,
+    date: format('dd/mm/yyyy hh:mm:ss', new Date()),
+    beneficiary: req.body.service_beneficiary_email,
+    provider: req.body.service_provider_email,
+    description: req.body.service_description,
+    hours: req.body.hours,
+    minutes: req.body.minutes,
+    ref: req.body.reference,
+    user_agent: req.headers['user-agent'],
+    user_ip: req.socket.remoteAddress
+  };
+
+  const mutation = 'INSERT INTO timecheck( date, beneficiary, provider, description, hours, minutes, ref, user_agent, user_ip) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *';
+  const values = [newRecord.date, newRecord.beneficiary, newRecord.provider, newRecord.description, newRecord.hours, newRecord.minutes, newRecord.ref, newRecord.user_agent, newRecord.user_ip];
+
+  client.query(mutation, values, (err, ret) => {
+    
+    if (err) 
     {
-      console.log('file exists');
-    } 
-    else 
-    {
-      console.log('file missing');
+      const response = [];
+      response["service_beneficiary_email"] = '';
+      response["service_provider_email"] = '';
+      response["service_description"] = '';
+      response["hours"] = '';
+      response["minutes"] = '';
+      response["reference"] = '';
+      
+      console.log(err)
 
-      fs.writeFile(FILES_DIR + '/registrations.json', '', function(err) 
-      {
-        if(err) {
-            console.log(err);
-        }
-        console.log("File saved!");
-
-        fs.appendFile( FILES_DIR + '/registrations.json', '[]', err => 
-        {
-          if (err) 
-          {
-            console.error(err);
-          }
-          console.log("File content created");
-        });
+      return res.render('index', {
+        response: response, 
+        error: 'une erreur est survenue lors de l\'enregistrement. Veuillez contacter l\'accorderie' 
       });
     }
-
-    fs.readFile( FILES_DIR + '/registrations.json', 'utf8', (err, data) => 
+    else 
     {
+      console.log('record added successfully.')
+      console.log(ret);
 
-        console.log('file read successfully ...');
+      if (process.env.NODE_ENV !== 'development') {
+        sendMailToBeneficiary(
+          newRecord.date,
+          newRecord.beneficiary,
+          newRecord.provider,
+          newRecord.description,
+          newRecord.hours,
+          newRecord.minutes,
+          newRecord.ref
+        );
 
-        const file = JSON.parse(data);
-        
-        var lastRecord = file[Object.keys(file)[Object.keys(file).length - 1]];
-        if( !lastRecord ) 
-        {
-          newRecord.id = 1;
-        } 
-        else 
-        {
-          newRecord.id = lastRecord.id +1;
-        }
+        sendMailToProvider(
+          newRecord.date,
+          newRecord.beneficiary,
+          newRecord.provider,
+          newRecord.description,
+          newRecord.hours,
+          newRecord.minutes,
+          newRecord.ref
+        );
 
-        file.push(newRecord);
+        sendMailToLaccorderie(
+          newRecord.date,
+          newRecord.beneficiary,
+          newRecord.provider,
+          newRecord.description,
+          newRecord.hours,
+          newRecord.minutes,
+          newRecord.ref
+        );
+      }
 
-        fs.writeFile( FILES_DIR + '/registrations.json', JSON.stringify(file), err => {
-            if (err) {
-                console.error(err);
-                return res.sendStatus(400).render('index').send({ error: 'Désolé, une erreur d\'enregistrement est survenue. Vous pouvez recommencer ou nous appeler au 0749702058 !' })
-            }
+      if (process.env.NODE_ENV !== 'development') {
+        sendMailTest(
+          newRecord.date,
+          newRecord.beneficiary,
+          newRecord.provider,
+          newRecord.description,
+          newRecord.hours,
+          newRecord.minutes,
+          newRecord.ref
+        );
+      }
 
-            console.log('record added successfully ...');            
+      const response = [];
+      response["service_beneficiary_email"] = '';
+      response["service_provider_email"] = '';
+      response["service_description"] = '';
+      response["hours"] = '';
+      response["minutes"] = '';
+      response["reference"] = '';
 
-            if (process.env.NODE_ENV !== 'development') {
-              sendMailToBeneficiary( 
-                newRecord.date, 
-                newRecord.beneficiary,
-                newRecord.provider,
-                newRecord.description,
-                newRecord.hours,
-                newRecord.minutes,
-                newRecord.ref
-              );
+      return res.render('index', { 
+        response: response, 
+        msg: 'Votre chèque a été ajouté avec succès. Un email de confirmation a été envoyé à la boite mail des protagonistes ainsi qu\'à celle de l\'accorderie.' 
+      });
+    }
+  })
+};
 
-              sendMailToProvider( 
-                  newRecord.date, 
-                  newRecord.beneficiary,
-                  newRecord.provider,
-                  newRecord.description,
-                  newRecord.hours,
-                  newRecord.minutes,
-                  newRecord.ref
-              );
+function sendMailToBeneficiary(
+  date,
+  beneficiary,
+  provider,
+  description,
+  hours,
+  minutes,
+  ref
+) {
+  console.log('Sending email to beneficiary');
 
-              sendMailToLaccorderie( 
-                  newRecord.date, 
-                  newRecord.beneficiary,
-                  newRecord.provider,
-                  newRecord.description,
-                  newRecord.hours,
-                  newRecord.minutes,
-                  newRecord.ref
-              );
-            }
+  const transport = nodemailer.createTransport(mailjetTransport({
+    auth: {
+      apiKey: process.env.MAILJETAPIKEY,
+      apiSecret: process.env.MAILJETSECRETKEY
+    }
+  }));
+  const mail = {
+    from: process.env.EMAILACCODERIE,
+    to: beneficiary,
 
-            if (process.env.NODE_ENV == 'development') {
-              sendMailTest( 
-                  newRecord.date, 
-                  newRecord.beneficiary,
-                  newRecord.provider,
-                  newRecord.description,
-                  newRecord.hours,
-                  newRecord.minutes,
-                  newRecord.ref
-              );
-            }
-           
-            const response = [];
-            response["service_beneficiary_email"] = '';
-            response["service_provider_email"] = '';
-            response["service_description"] = '';
-            response["hours"] = '';
-            response["minutes"] = '';
-            response["reference"] = '';
+    subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider + ' le ' + date,
 
-            return res.render('index', {response : response, msg: 'Votre chèque a été ajouté avec succès. Un email de confirmation a été envoyé à la boite mail des protagonistes ainsi qu\'à celle de l\'accorderie.'});
-        });
-    });
+    html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary + '</b> rendu par <b>' + provider + '</b> ,</p><p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b></p>'
+  };
 
-    function sendMailToBeneficiary(
-        date, 
-        beneficiary,
-        provider,
-        description,
-        hours,
-        minutes,
-        ref
-    ) {
-        console.log('Sending email to beneficiary');
+  try {
+    const info = transport.sendMail(mail);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
-        const transport = nodemailer.createTransport(mailjetTransport({
-            auth: {
-              apiKey: process.env.MAILJETAPIKEY,
-              apiSecret: process.env.MAILJETSECRETKEY
-            }
-          }));
-          const mail = {
-            from: process.env.EMAILACCODERIE,
-            to: beneficiary,
+function sendMailToProvider(
+  date,
+  beneficiary,
+  provider,
+  description,
+  hours,
+  minutes,
+  ref
+) {
+  console.log('Sending email to provider');
 
-            subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider +' le '+ date ,
+  const transport = nodemailer.createTransport(mailjetTransport({
+    auth: {
+      apiKey: process.env.MAILJETAPIKEY,
+      apiSecret: process.env.MAILJETSECRETKEY
+    }
+  }));
+  const mail = {
+    from: process.env.EMAILACCODERIE,
+    to: provider,
 
-            html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>'+ beneficiary +'</b> rendu par <b>'+ provider +'</b> ,</p><p> pour le service: <p><b>"'+ description +'"</b></p>, le <b>'+ date +'</b>, dont la durée est de <b>'+ hours +'h. '+ minutes +'min.</b></p>'
-          };
-          
-          try {
-            const info = transport.sendMail(mail);
-          } catch (err) {
-            console.error(err);
-          }
-    };
+    subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider + ' le ' + date,
 
-    function sendMailToProvider(
-        date, 
-        beneficiary,
-        provider,
-        description,
-        hours,
-        minutes,
-        ref
-    ) {
-        console.log('Sending email to provider');
+    html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary + '</b> rendu par <b>' + provider + '</b> ,</p><p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b></p>'
+  };
 
-        const transport = nodemailer.createTransport(mailjetTransport({
-            auth: {
-              apiKey: process.env.MAILJETAPIKEY,
-              apiSecret: process.env.MAILJETSECRETKEY
-            }
-          }));
-          const mail = {
-            from: process.env.EMAILACCODERIE,
-            to: provider,
-            
-            subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider +' le '+ date ,
+  try {
+    const info = transport.sendMail(mail);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
-            html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>'+ beneficiary +'</b> rendu par <b>'+ provider +'</b> ,</p><p> pour le service: <p><b>"'+ description +'"</b></p>, le <b>'+ date +'</b>, dont la durée est de <b>'+ hours +'h. '+ minutes +'min.</b></p>'
-          };
-          
-          try {
-            const info = transport.sendMail(mail);
-          } catch (err) {
-            console.error(err);
-          }
-    };
+function sendMailToLaccorderie(
+  date,
+  beneficiary,
+  provider,
+  description,
+  hours,
+  minutes,
+  ref
+) {
+  console.log('Sending email to l\'accorderie');
 
-    function sendMailToLaccorderie(
-        date, 
-        beneficiary,
-        provider,
-        description,
-        hours,
-        minutes,
-        ref
-    ) {
-        console.log('Sending email to l\'accorderie');
+  const transport = nodemailer.createTransport(mailjetTransport({
+    auth: {
+      apiKey: process.env.MAILJETAPIKEY,
+      apiSecret: process.env.MAILJETSECRETKEY
+    }
+  }));
+  const mail = {
+    from: process.env.EMAILACCODERIE,
+    to: process.env.EMAILACCODERIE,
+    subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider + ' le ' + date,
 
-        const transport = nodemailer.createTransport(mailjetTransport({
-            auth: {
-              apiKey: process.env.MAILJETAPIKEY,
-              apiSecret: process.env.MAILJETSECRETKEY
-            }
-          }));
-          const mail = {
-            from: process.env.EMAILACCODERIE,
-            to: process.env.EMAILACCODERIE,
-            subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider +' le '+ date ,
+    html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary + '</b> rendu par <b>' + provider + '</b> ,</p><p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b></p></br></br></br><p><a target="_blank" href="https://laccoderie.herokuapp.com/list-accorderie--records-list-for-admins">Lien vers la liste des cheques temps</a></p>'
+  };
 
-            html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>'+ beneficiary +'</b> rendu par <b>'+ provider +'</b> ,</p><p> pour le service: <p><b>"'+ description +'"</b></p>, le <b>'+ date +'</b>, dont la durée est de <b>'+ hours +'h. '+ minutes +'min.</b></p></br></br></br><p><a target="_blank" href="https://laccoderie.herokuapp.com/list-accorderie--records-list-for-admins">Lien vers la liste des cheques temps</a></p>'
-          };
-          
-          try {
-            const info = transport.sendMail(mail);
-          } catch (err) {
-            console.error(err);
-          }
-    };
+  try {
+    const info = transport.sendMail(mail);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
-    function sendMailTest(
-        date, 
-        beneficiary,
-        provider,
-        description,
-        hours,
-        minutes,
-        ref
-    ) {
-        console.log('Sending email to Leander');
+function sendMailTest(
+  date,
+  beneficiary,
+  provider,
+  description,
+  hours,
+  minutes,
+  ref
+) {
+  console.log('Sending email to Leander');
 
-        const transport = nodemailer.createTransport(mailjetTransport({
-            auth: {
-              apiKey: process.env.MAILJETAPIKEY,
-              apiSecret: process.env.MAILJETSECRETKEY
-            }
-          }));
-          const mail = {
-            from: process.env.EMAILLEANDER,
-            to: process.env.EMAILLEANDER,
-            subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider +' le '+ date ,
+  const transport = nodemailer.createTransport(mailjetTransport({
+    auth: {
+      apiKey: process.env.MAILJETAPIKEY,
+      apiSecret: process.env.MAILJETSECRETKEY
+    }
+  }));
+  const mail = {
+    from: process.env.EMAILLEANDER,
+    to: process.env.EMAILLEANDER,
+    subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider + ' le ' + date,
 
-            html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>'+ beneficiary +'</b> rendu par <b>'+ provider +'</b> ,</p><p> pour le service: <p><b>"'+ description +'"</b></p>, le <b>'+ date +'</b>, dont la durée est de <b>'+ hours +'h. '+ minutes +'min.</b></p>'
-          };
+    html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary + '</b> rendu par <b>' + provider + '</b> ,</p><p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b></p></br></br></br><p><a target="_blank" href="https://laccoderie.herokuapp.com/list-accorderie--records-list-for-admins">Lien vers la liste des cheques temps</a></p>'
+  };
 
-          try {
-            const info = transport.sendMail(mail);
-          } catch (err) {
-            console.error(err);
-          }
-    };
+  try {
+    const info = transport.sendMail(mail);
+  } catch (err) {
+    console.error(err);
+  }
 };

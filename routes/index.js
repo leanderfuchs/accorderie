@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var app = express();
 const { body } = require('express-validator');
 
 const { addRecordController } = require('../controllers/recordController.js');
