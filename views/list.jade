@@ -6,17 +6,24 @@ block content
     header.py-2
       .h1.text-center Registration list
       .text-center.my-4
-        button.btn.btn-primary(onclick="downloadCsv( #{file} )") Téléchager
+        button.btn.btn-primary(onclick="downloadCsv( #{dataArray} )") Téléchager
     
     .row.row-cols-1.row-cols-md-3.g-4
       each record, i in records
         .col
           .card.h-100.bg-light
             .card-header
-              .small.float-end Le #{record.date}
-              .h5.bold # #{record.id}
-              
+              .float-end Le #{record.date}
+              .h5.bold # #{record.id}             
+            
             .card-body
+              .float-end
+                form(method="POST", action='/list-accorderie--records-list-for-admins/delete/:id')
+                  div.form-group
+                    input.form-control(type='hidden',name='_method', value="PUT")                                   
+                    input#recordID.form-control(type='hidden',name='recordID', required='true', value=record.id )                 
+                    button(type="submit", value="DELETE", aria-label="Close", onclick="return confirm('Cette suppression est définitive. Êtes-vous certain de vouloir poursuivre ?')").btn-close 
+              
               if(record.ref)
                 .small ref: #{record.ref}
               

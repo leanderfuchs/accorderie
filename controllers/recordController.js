@@ -14,10 +14,12 @@ const client = new Client({
   database: process.env.PGDATABASE,
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT,
-  ssl: {
-    rejectUnauthorized: false
-  }
 });
+
+if (process.env.NODE_ENV !== 'development')
+{
+    client.ssl = {rejectUnauthorized: false};
+}
 
 client.connect()
 
@@ -69,7 +71,6 @@ exports.addRecordController = function (req, res, body) {
     else 
     {
       console.log('record added successfully.')
-      console.log(ret);
 
       if (process.env.NODE_ENV !== 'development') {
         sendMailToBeneficiary(

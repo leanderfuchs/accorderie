@@ -3,7 +3,6 @@ var router = express.Router();
 const { body } = require('express-validator');
 
 const { addRecordController } = require('../controllers/recordController.js');
-const { recordListController } = require('../controllers/recordListController.js');
 
 const response = [];
 response["service_beneficiary_email"] = '';
@@ -19,7 +18,7 @@ router.get('/', function(req, res, next) {
 });
 
 /* POST home page. */
-router.post('/processing', 
+router.post('/', 
     body('service_beneficiary_email')
       .notEmpty()
       .isEmail()
@@ -64,7 +63,13 @@ router.post('/processing',
     addRecordController
 );
 
-/* GET home page. */
-router.get('/list-accorderie--records-list-for-admins',  recordListController);
+const { 
+  recordListController, 
+  deleteRecordController 
+} = require('../controllers/recordListController.js');
+
+/* LIST. */
+router.get('/list-accorderie--records-list-for-admins', recordListController);
+router.post('/list-accorderie--records-list-for-admins/delete/:recordID', deleteRecordController);
 
 module.exports = router;
