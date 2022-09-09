@@ -44,7 +44,7 @@ const deleteRecordController = ((req, res) => {
     }
     else {
       console.log('Deleted successfully.');
-      return res.redirect('/list-accorderie-records-list-for-admins');
+      return res.redirect('/accorderie-records-list-for-admins');
     }
   });
 })
