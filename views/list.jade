@@ -6,8 +6,10 @@ block content
     header.py-2
       .h1.text-center Registration list
       .text-center.my-4
-        button.btn.btn-primary(onclick="downloadCsv( #{dataArray} )") Téléchager
+        a(href="/list-accorderie-records-list-for-admins/download-csv/").btn.btn-primary Téléchager
     
+    if records.length == 0
+      h2.text-center Il n'y a pas encore d'enregistrements
     .row.row-cols-1.row-cols-md-3.g-4
       each record, i in records
         .col
@@ -18,7 +20,7 @@ block content
             
             .card-body
               .float-end
-                form(method="POST", action='/list-accorderie--records-list-for-admins/delete/:id')
+                form(method="POST", action='/list-accorderie-records-list-for-admins/delete/' + record.id)
                   div.form-group
                     input.form-control(type='hidden',name='_method', value="PUT")                                   
                     input#recordID.form-control(type='hidden',name='recordID', required='true', value=record.id )                 

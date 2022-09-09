@@ -46,8 +46,9 @@ exports.addRecordController = function (req, res, body) {
     user_ip: req.socket.remoteAddress
   };
 
-  const mutation = 'INSERT INTO timecheck( date, beneficiary, provider, description, hours, minutes, ref, user_agent, user_ip) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *';
-  const values = [newRecord.date, newRecord.beneficiary, newRecord.provider, newRecord.description, newRecord.hours, newRecord.minutes, newRecord.ref, newRecord.user_agent, newRecord.user_ip];
+  const now = new Date();
+  const mutation = 'INSERT INTO timecheck( date, beneficiary, provider, description, hours, minutes, ref, user_agent, user_ip, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *';
+  const values = [newRecord.date, newRecord.beneficiary, newRecord.provider, newRecord.description, newRecord.hours, newRecord.minutes, newRecord.ref, newRecord.user_agent, newRecord.user_ip, now];
 
   client.query(mutation, values, (err, ret) => {
     
@@ -220,7 +221,7 @@ function sendMailToLaccorderie(
     to: process.env.EMAILACCODERIE,
     subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider + ' le ' + date,
 
-    html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary + '</b> rendu par <b>' + provider + '</b> ,</p><p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b></p></br></br></br><p><a target="_blank" href="https://laccoderie.herokuapp.com/list-accorderie--records-list-for-admins">Lien vers la liste des cheques temps</a></p>'
+    html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary + '</b> rendu par <b>' + provider + '</b> ,</p><p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b></p></br></br></br><p><a target="_blank" href="https://laccoderie.herokuapp.com/list-accorderie-records-list-for-admins">Lien vers la liste des cheques temps</a></p>'
   };
 
   try {
@@ -252,7 +253,7 @@ function sendMailTest(
     to: process.env.EMAILLEANDER,
     subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider + ' le ' + date,
 
-    html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary + '</b> rendu par <b>' + provider + '</b> ,</p><p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b></p></br></br></br><p><a target="_blank" href="https://laccoderie.herokuapp.com/list-accorderie--records-list-for-admins">Lien vers la liste des cheques temps</a></p>'
+    html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary + '</b> rendu par <b>' + provider + '</b> ,</p><p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b></p></br></br></br><p><a target="_blank" href="https://laccoderie.herokuapp.com/list-accorderie-records-list-for-admins">Lien vers la liste des cheques temps</a></p>'
   };
 
   try {

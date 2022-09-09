@@ -65,11 +65,13 @@ router.post('/',
 
 const { 
   recordListController, 
-  deleteRecordController 
+  deleteRecordController,
+  downloadRecordsController
 } = require('../controllers/recordListController.js');
 
 /* LIST. */
-router.get('/list-accorderie--records-list-for-admins', recordListController);
-router.post('/list-accorderie--records-list-for-admins/delete/:recordID', deleteRecordController);
+router.get('/list-accorderie-records-list-for-admins', recordListController);
+router.post('/list-accorderie-records-list-for-admins/delete/:recordID', deleteRecordController);
+router.get('/list-accorderie-records-list-for-admins/download-csv/', downloadRecordsController);
 
 module.exports = router;
