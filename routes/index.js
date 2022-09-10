@@ -38,8 +38,8 @@ router.post('/',
 
     body('service_description')
       .notEmpty()
-      .isLength({ min: 10 })
-      .withMessage('La description doit contenir au moins 10 caractères.'),
+      .isLength({ min: 15 })
+      .withMessage('La description doit contenir au moins 15 caractères.'),
 
     body('hours')
       .isFloat({ min: 0, max: 39 })

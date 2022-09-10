@@ -24,7 +24,7 @@ const recordListController = function (req, res, body) {
   client.query(query, (err, data) => {
 
     if (err) {
-      return res.render('list', { error: 'une erreur est survenue lors de l\'enregistrement. Veuillez contacter l\'accorderie' });
+      return res.render('list', { error: 'une erreur est survenue. Veuillez contacter l\'accorderie' });
     }
     else {
       const dataArray = Array.from(data.rows);
