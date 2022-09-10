@@ -13,10 +13,9 @@ const client = new Client({
   database: process.env.PGDATABASE,
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT,
-  ssl: { rejectUnauthorized: false }
 });
 
-if ( process.env.PG_USE_SSL ){
+if (process.env.NODE_ENV !== 'development'){
     client.ssl = {rejectUnauthorized: false};
 }
 
@@ -226,7 +225,7 @@ function sendMailToLaccorderie(
     to: process.env.EMAILACCODERIE,
     subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider + ' le ' + date,
 
-    html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary + '</b> rendu par <b>' + provider + '</b> ,</p><p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b></p></br></br></br><p><a target="_blank" href="https://accorderie.herokuapp.com/accorderie-records-list-for-admins">Lien vers la liste des cheques temps</a></p>'
+    html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary + '</b> rendu par <b>' + provider + '</b> ,</p><p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b><b>Services Individuels</b></p></br></br></br><p><a target="_blank" href="https://accorderie.herokuapp.com/accorderie-records-list-for-admins">Lien vers la liste des cheques temps</a></p>'
   };
 
   try {
@@ -254,8 +253,8 @@ function sendMailTest(
     }
   }));
   const mail = {
-    from: process.env.TESTER_EMAIL,
-    to: process.env.TESTER_EMAIL,
+    from: process.env.EMAILLEANDER,
+    to: process.env.EMAILLEANDER,
     subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider + ' le ' + date,
 
     html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary + '</b> rendu par <b>' + provider + '</b> ,</p><p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b></p></br></br></br><p><a target="_blank" href="https://laccoderie.herokuapp.com/accorderie-records-list-for-admins">Lien vers la liste des cheques temps</a></p>'
