@@ -1,4 +1,3 @@
-var fs = require('fs');
 var format = require('date-format');
 const { validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
@@ -16,12 +15,17 @@ const client = new Client({
   port: process.env.PGPORT,
 });
 
-if (process.env.NODE_ENV !== 'development')
-{
+if (process.env.NODE_ENV !== 'development'){
     client.ssl = {rejectUnauthorized: false};
 }
 
-client.connect()
+client.connect(err => {
+  if (err) {
+    console.error('connection error', err.stack)
+  } else {
+    console.log('connected')
+  }
+})
 
 exports.addRecordController = function (req, res, body) {
 
@@ -47,7 +51,7 @@ exports.addRecordController = function (req, res, body) {
   };
 
   const now = new Date();
-  const mutation = 'INSERT INTO timecheck( date, beneficiary, provider, description, hours, minutes, ref, user_agent, user_ip, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *';
+  const mutation = 'INSERT INTO timecheck( date, beneficiary, provider, description, hours, minutes, ref, user_agent, user_ip, updated_at ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *';
   const values = [newRecord.date, newRecord.beneficiary, newRecord.provider, newRecord.description, newRecord.hours, newRecord.minutes, newRecord.ref, newRecord.user_agent, newRecord.user_ip, now];
 
   client.query(mutation, values, (err, ret) => {
