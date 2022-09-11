@@ -146,7 +146,7 @@ function sendMailToBeneficiary(
     }
   }));
   const mail = {
-    from: process.env.EMAILACCODERIE,
+    from: process.env.EMAIL_ACCORDERIE,
     to: beneficiary,
 
     subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider + ' le ' + date,
@@ -178,7 +178,7 @@ function sendMailToProvider(
     }
   }));
   const mail = {
-    from: process.env.EMAILACCODERIE,
+    from: process.env.EMAIL_ACCORDERIE,
     to: provider,
 
     subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider + ' le ' + date,
@@ -210,8 +210,8 @@ function sendMailToLaccorderie(
     }
   }));
   const mail = {
-    from: process.env.EMAILACCODERIE,
-    to: process.env.EMAILACCODERIE,
+    from: process.env.EMAIL_ACCORDERIE,
+    to: process.env.EMAIL_ACCORDERIE,
     subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider + ' le ' + date,
 
     html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary + '</b> rendu par <b>' + provider + '</b> ,</p><p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b><b>Services Individuels</b></p></br></br></br><p><a target="_blank" href="https://accorderie.herokuapp.com/accorderie-records-list-for-admins">Lien vers la liste des cheques temps</a></p>'
