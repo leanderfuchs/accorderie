@@ -27,7 +27,6 @@ const recordListController = function (req, res, body) {
       return res.render('list', { error: 'une erreur est survenue. Veuillez contacter l\'accorderie' });
     }
     else {
-      console.log(data.rows);
       const dataArray = Array.from(data.rows);
       return res.render('list', { dataArray: [dataArray], records: data.rows });
     }
@@ -41,6 +40,7 @@ const deleteRecordController = ((req, res) => {
 
   client.query(query, (err, data) => {
     if (err) {
+      console.log(err);
       return res.render('list', { error: 'une erreur est survenue lors de la suppression. Veuillez contacter l\'accorderie' });
     }
     else {
@@ -56,6 +56,7 @@ const downloadRecordsController = ((req, res) => {
   client.query(query, (err, data) => {
 
     if (err) {
+      console.log(err);
       return res.render('index', { error: 'une erreur est survenue lors de l\'enregistrement. Veuillez contacter l\'accorderie' });
     }
     else {
@@ -70,22 +71,6 @@ const downloadRecordsController = ((req, res) => {
     }
   });
 })
-
-const setDuration = (record) => {
-  if (record.minutes < 10) {
-    record.minutes = '0' + record.minutes;
-  }
-
-  if (record.hours < 10) {
-    record.hours = '0' + record.hours;
-  }
-
-  record.duration = record.hours + 'h' + record.minutes + 'm';
-  delete record.hours;
-  delete record.minutes;
-
-  return record;
-}
 
 module.exports = {
   recordListController,

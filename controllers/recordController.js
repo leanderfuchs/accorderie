@@ -49,8 +49,8 @@ exports.addRecordController = function (req, res, body) {
   };
 
   const now = new Date();
-  const mutation = 'INSERT INTO timecheck( date, beneficiary, provider, description, hours, minutes, ref, user_agent, user_ip ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *';
-  const values = [newRecord.date, newRecord.beneficiary, newRecord.provider, newRecord.description, newRecord.hours, newRecord.minutes, newRecord.ref, newRecord.user_agent, newRecord.user_ip];
+  const mutation = 'INSERT INTO timecheck( date, beneficiary, provider, description, hours, minutes, user_agent, user_ip ) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *';
+  const values = [newRecord.date, newRecord.beneficiary, newRecord.provider, newRecord.description, newRecord.hours, newRecord.minutes, newRecord.user_agent, newRecord.user_ip];
 
   client.query(mutation, values, (err, ret) => {
     
@@ -81,8 +81,7 @@ exports.addRecordController = function (req, res, body) {
           newRecord.provider,
           newRecord.description,
           newRecord.hours,
-          newRecord.minutes,
-          newRecord.ref
+          newRecord.minutes
         );
 
         sendMailToProvider(
@@ -91,8 +90,7 @@ exports.addRecordController = function (req, res, body) {
           newRecord.provider,
           newRecord.description,
           newRecord.hours,
-          newRecord.minutes,
-          newRecord.ref
+          newRecord.minutes
         );
 
         sendMailToLaccorderie(
@@ -101,8 +99,7 @@ exports.addRecordController = function (req, res, body) {
           newRecord.provider,
           newRecord.description,
           newRecord.hours,
-          newRecord.minutes,
-          newRecord.ref
+          newRecord.minutes
         );
       }
 
@@ -113,8 +110,7 @@ exports.addRecordController = function (req, res, body) {
           newRecord.provider,
           newRecord.description,
           newRecord.hours,
-          newRecord.minutes,
-          newRecord.ref
+          newRecord.minutes
         );
       }
 
@@ -140,7 +136,6 @@ function sendMailToBeneficiary(
   description,
   hours,
   minutes,
-  ref
 ) {
   console.log('Sending email to beneficiary');
 
@@ -173,7 +168,6 @@ function sendMailToProvider(
   description,
   hours,
   minutes,
-  ref
 ) {
   console.log('Sending email to provider');
 
@@ -206,7 +200,6 @@ function sendMailToLaccorderie(
   description,
   hours,
   minutes,
-  ref
 ) {
   console.log('Sending email to l\'accorderie');
 
@@ -238,7 +231,6 @@ function sendMailTest(
   description,
   hours,
   minutes,
-  ref
 ) {
   console.log('Sending email to Leander');
 
