@@ -91,19 +91,6 @@ block content
                 option(selected=response.minutes==val value="#{val}") #{val}
             span.input-group-text minutes
       
-        .col-md-6.col-sm-12
-          label(for="reference") Référence
-          .input-group
-            span(id="basic-addon1").input-group-text Ref #
-            input(
-              type="text",
-              placeholder="optionnel",
-              name="reference",
-              aria-label="reference",
-              aria-describedby="reference"
-              value="#{response.reference}"            
-              ).form-control
-      
         .col-12
           .d-grid.gap-2.col-6.mx-auto
             button(type="submit").btn.btn-primary Envoyer

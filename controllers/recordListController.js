@@ -10,12 +10,10 @@ const client = new Client({
   database: process.env.PGDATABASE,
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT,
-  ssl: { rejectUnauthorized: false }
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
-
-if (process.env.PG_USE_SSL) {
-  client.ssl = { rejectUnauthorized: false };
-}
 
 client.connect();
 
@@ -25,9 +23,11 @@ const recordListController = function (req, res, body) {
   client.query(query, (err, data) => {
 
     if (err) {
+      console.log(err);
       return res.render('list', { error: 'une erreur est survenue. Veuillez contacter l\'accorderie' });
     }
     else {
+      console.log(data.rows);
       const dataArray = Array.from(data.rows);
       return res.render('list', { dataArray: [dataArray], records: data.rows });
     }

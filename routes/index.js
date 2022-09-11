@@ -56,10 +56,6 @@ router.post('/',
         };
       }),
 
-    body('reference')
-      .isString()
-      .withMessage('La référence doit être composée de lettres et de chiffres.'),
-
     addRecordController
 );
 

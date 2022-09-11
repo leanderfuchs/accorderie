@@ -3,7 +3,7 @@ const { validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
 const mailjetTransport = require('nodemailer-mailjet-transport');
 const dotenv = require('dotenv');
-const { Client } = require('pg')
+const { Client } = require('pg');
 
 dotenv.config();
 
@@ -13,11 +13,10 @@ const client = new Client({
   database: process.env.PGDATABASE,
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
-
-if (process.env.NODE_ENV !== 'development'){
-    client.ssl = {rejectUnauthorized: false};
-}
 
 client.connect(err => {
   if (err) {
@@ -45,14 +44,13 @@ exports.addRecordController = function (req, res, body) {
     description: req.body.service_description,
     hours: req.body.hours,
     minutes: req.body.minutes,
-    ref: req.body.reference,
     user_agent: req.headers['user-agent'],
     user_ip: req.socket.remoteAddress
   };
 
   const now = new Date();
-  const mutation = 'INSERT INTO timecheck( date, beneficiary, provider, description, hours, minutes, ref, user_agent, user_ip, updated_at ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *';
-  const values = [newRecord.date, newRecord.beneficiary, newRecord.provider, newRecord.description, newRecord.hours, newRecord.minutes, newRecord.ref, newRecord.user_agent, newRecord.user_ip, now];
+  const mutation = 'INSERT INTO timecheck( date, beneficiary, provider, description, hours, minutes, ref, user_agent, user_ip ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *';
+  const values = [newRecord.date, newRecord.beneficiary, newRecord.provider, newRecord.description, newRecord.hours, newRecord.minutes, newRecord.ref, newRecord.user_agent, newRecord.user_ip];
 
   client.query(mutation, values, (err, ret) => {
     
@@ -64,7 +62,6 @@ exports.addRecordController = function (req, res, body) {
       response["service_description"] = '';
       response["hours"] = '';
       response["minutes"] = '';
-      response["reference"] = '';
       
       console.log(err)
 
@@ -127,7 +124,6 @@ exports.addRecordController = function (req, res, body) {
       response["service_description"] = '';
       response["hours"] = '';
       response["minutes"] = '';
-      response["reference"] = '';
 
       return res.render('index', { 
         response: response, 
