@@ -103,7 +103,7 @@ exports.addRecordController = function (req, res, body) {
         );
       }
 
-      if (process.env.NODE_ENV !== 'development') {
+      if (process.env.NODE_ENV == 'development') {
         sendMailTest(
           newRecord.date,
           newRecord.beneficiary,
