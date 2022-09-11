@@ -13,9 +13,9 @@ const client = new Client({
   database: process.env.PGDATABASE,
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  // ssl: {
+  //   rejectUnauthorized: false
+  // }
 });
 
 client.connect(err => {
@@ -158,6 +158,10 @@ function sendMailToBeneficiary(
     const info = transport.sendMail(mail);
   } catch (err) {
     console.error(err);
+
+    return res.render('index', { 
+      msg: 'Erreur de serveur email. Le bénéficiaire ne recevera pas d\'email de confirmation' 
+    });
   }
 };
 
@@ -190,6 +194,11 @@ function sendMailToProvider(
     const info = transport.sendMail(mail);
   } catch (err) {
     console.error(err);
+
+    return res.render('index', { 
+      msg: 'Erreur de serveur email. L\'accordeur ne recevera pas d\'email de confirmation' 
+    });
+
   }
 };
 
@@ -220,7 +229,12 @@ function sendMailToLaccorderie(
   try {
     const info = transport.sendMail(mail);
   } catch (err) {
+
     console.error(err);
+
+    return res.render('index', { 
+      msg: 'Erreur de serveur email. Veuillez contacter l\'accorderie pour signaler votre enregistrement' 
+    });
   }
 };
 
@@ -232,7 +246,7 @@ function sendMailTest(
   hours,
   minutes,
 ) {
-  console.log('Sending email to Leander');
+  console.log('Sending email to tester');
 
   const transport = nodemailer.createTransport(mailjetTransport({
     auth: {
@@ -245,12 +259,16 @@ function sendMailTest(
     to: process.env.EMAIL_TEST,
     subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary + ' par ' + provider + ' le ' + date,
 
-    html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary + '</b> rendu par <b>' + provider + '</b> ,</p><p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b></p></br></br></br><p><a target="_blank" href="https://laccoderie.herokuapp.com/accorderie-records-list-for-admins">Lien vers la liste des cheques temps</a></p>'
+    html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary + '</b> rendu par <b>' + provider + '</b> ,</p><p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b></p></br></br></br><p><a target="_blank" href="https://accorderie.herokuapp.com/accorderie-records-list-for-admins">Lien vers la liste des cheques temps</a></p>'
   };
 
   try {
     const info = transport.sendMail(mail);
   } catch (err) {
     console.error(err);
+
+    return res.render('index', { 
+      msg: 'Erreur de serveur email. Test message' 
+    });
   }
 };
