@@ -3,22 +3,18 @@ var router = express.Router();
 const { body } = require('express-validator');
 
 const { addRecordController } = require('../controllers/recordController.js');
-
-const response = [];
-response["service_beneficiary_email"] = '';
-response["service_provider_email"] = '';
-response["service_description"] = '';
-response["hours"] = '';
-response["minutes"] = '';
-response["reference"] = '';
+const { indexController } = require('../controllers/indexController.js');
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', {response});
-});
+router.get('/', indexController);
 
 /* POST home page. */
 router.post('/', 
+    
+    body('service_beneficiary_name')
+      .isLength({ min: 2 })
+      .withMessage('Le nom du bénéficiaire doit au moins contenir 2 lettres.'),
+
     body('service_beneficiary_email')
       .notEmpty()
       .isEmail()
@@ -31,6 +27,17 @@ router.post('/',
       .custom((value,{req}) => {
         if(value == req.body.service_beneficiary_email){
             throw new Error("Les deux emails ne peuvent être les mêmes !");
+        } else {
+            return value;
+        };
+      }),
+
+    body('service_provider_name')
+      .isLength({ min: 2 })
+      .withMessage('Le nom de la personne ayant rendu le service doit au moins contenir 2 lettres.')
+      .custom((value,{req}) => {
+        if(value == req.body.service_beneficiary_name){
+            throw new Error("Les deux noms ne peuvent être les mêmes !");
         } else {
             return value;
         };

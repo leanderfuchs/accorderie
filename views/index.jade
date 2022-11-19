@@ -18,16 +18,27 @@ block content
               each error, i in errors
                   li.alert.alert-danger #{error.msg}
 
-        if locals.msg
-          .alert.alert-success(role="alert") #{msg}
-
         if locals.error
           .alert.alert-danger(role="alert") #{error}
 
       form(name="create_time" method="post", action="").row.g-5
         
         .col-md-6.col-sm-12
-          label(for="service-beneficiary-email") Bénéficiaire du service rendu
+          label(for="service-beneficiary-email") Bénéficiaire du service:
+          div.input-group.required
+            span.input-group-text#service-beneficiary-email Nom
+            input(
+              type="text", 
+              name="service_beneficiary_name", 
+              placeholder="Pierre dupont", 
+              aria-label="beneficiary_name", 
+              aria-describedby="service-beneficiary-name",
+              value="#{response.service_beneficiary_name}"
+              required
+            ).form-control
+
+        .col-md-6.col-sm-12
+          label(for="service-beneficiary-email")
           div.input-group.required
             span.input-group-text#service-beneficiary-email @
             input(
@@ -41,7 +52,21 @@ block content
             ).form-control
         
         .col-md-6.col-sm-12
-          label(for="service-provider-email") Service rendu par:
+          label(for="service-provider-name") Service rendu par:
+          div.input-group.required
+            span.input-group-text#service-provider-name Nom
+            input(
+              type="text", 
+              name="service_provider_name", 
+              placeholder="Jacques durand", 
+              aria-label="provider name", 
+              aria-describedby="service-provider-name",
+              value="#{response.service_provider_name}"
+              required
+            ).form-control
+
+        .col-md-6.col-sm-12
+          label(for="service-provider-email")
           div.input-group.required
             span.input-group-text#service-provider-email @
             input(
@@ -68,7 +93,7 @@ block content
               |#{response.service_description}
       
 
-        .col-md-6.col-sm-12
+        .col-md-4.col-sm-12
           label(for="service-duration") Payez contre ce chèque ( en durée )
           .input-group.required
             select(
@@ -91,6 +116,29 @@ block content
                 option(selected=response.minutes==val value="#{val}") #{val}
             span.input-group-text minutes
       
+        .col-md-4.col-sm-12
+          label(for="select-category") Catégorie de service
+          .input-group
+            select(
+              id="service_category",
+              name="category",
+              aria-label="select-category",
+              onchange="showSubCategories(this)"
+            ).form-control
+              each category in categories
+                option(selected=response.category==category.category categoryId="#{category.id}" value="#{category.title}") #{category.title}
+
+        .col-md-4.col-sm-12
+          label(for="select-sub-category") Sous-catégorie
+          .input-group
+            select(
+              id="select-sub-category",
+              name="sub_category",
+              aria-label="sub-category"
+            ).form-control
+              each sub_category in subCategories
+                option(selected=response.category==sub_category value="#{sub_category.title}" category_id="#{sub_category.category_id}") #{sub_category.title}
+
         .col-12
           .d-grid.gap-2.col-6.mx-auto
             button(type="submit").btn.btn-primary Envoyer
@@ -107,6 +155,31 @@ block content
         allowfullscreen
       )
     .pt-3.xt-4.text-muted.text-center.small
-      p:  a(href="http://example.com" ,target="_blank") L'accorderie Mentions légales
+      p:  a(href="https://www.accorderie.fr/mentions-legales/" ,target="_blank") L'accorderie Mentions légales
             span &copy; l’accorderie |
             a(href="https://www.accorderie.fr/coeurdesbauges/contact/" ,target="_blank") Contact
+  
+  script.
+
+    function showSubCategories(value){
+      const categoryId = value.selectedOptions[0].attributes.categoryid.value;
+
+      const options = document.querySelector('#select-sub-category');
+      var selected = null;
+
+      for(let i=0; i<options.childNodes.length; i++){
+    
+        options.childNodes[i].hidden = true;
+
+        const selectedCatgoryId = options.childNodes[i].attributes.category_id.nodeValue;
+
+        if(selectedCatgoryId == categoryId){
+          options.childNodes[i].hidden = false;
+
+          if( selected == null ){
+            options.childNodes[i].selected = true;
+            selected = true;
+          }
+        }
+      }
+    }

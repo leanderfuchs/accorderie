@@ -27,17 +27,21 @@ block content
                     button(type="submit", value="DELETE", aria-label="Close", onclick="return confirm('Cette suppression est définitive. Êtes-vous certain de vouloir poursuivre ?')").btn-close 
               
               .p De : 
-                span.bold #{record.provider}
+                span #[strong #{record.provider_name}], #{record.provider_email} 
               .p A : 
-                span.bold #{record.beneficiary}
-              .p Durée : 
-                span.bold #{record.hours}:#{record.minutes}
-                hr
+                span #[strong #{record.beneficiary_name}], #{record.beneficiary_email}
+              .p.mt-2 Durée : 
+                span #[strong #{record.hours}:#{record.minutes}]
+              .p.mt-2 Categorie : 
+              .p #[strong #{record.category}]
+              .p.mt-2 Sous-categorie : 
+              .p #[strong #{record.sub_category}]
+              hr
               .p description : 
               .card.p-2.my-3
                 .p #{record.description}
 
-            .card-footer.text-muted
+            .card-footer.text-muteds
               .small user ip: #{record.user_ip}
               hr
               .small user agent: #{record.user_agent}

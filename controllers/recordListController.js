@@ -10,12 +10,16 @@ const client = new Client({
   database: process.env.PGDATABASE,
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  // ssl: {
+  //   rejectUnauthorized: false
+  // }
 });
 
-client.connect();
+client.connect(err => {
+  if (err) {
+    console.error('connection error', err.stack)
+  } 
+})
 
 const recordListController = function (req, res, body) {
   const query = 'SELECT * FROM timecheck WHERE is_deleted = false ORDER BY id DESC';
