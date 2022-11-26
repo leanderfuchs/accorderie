@@ -240,7 +240,7 @@ function sendMailToBeneficiary(
   }));
   const mail = {
     from: process.env.EMAIL_ACCORDERIE,
-    to: beneficiary,
+    to: beneficiary_email,
     subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary_name + ',  par ' + providerName + ' le ' + date,
 
     html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary_name + ' ' + beneficiary_email + '</b> rendu par <b>' + providerName + ' ' + providerEmail + '</b> ,</p> <p>Categorie:' + category + ' - ' + sub_category + ' </p>  <p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b></p></b></p></br></br></br><p><a target="_blank" href="https://accorderie-des-bauges.up.railway.app/">Page d\'ajout de cheque temps</a></p>'
@@ -280,7 +280,7 @@ function sendMailToProvider(
   }));
   const mail = {
     from: process.env.EMAIL_ACCORDERIE,
-    to: provider,
+    to: providerEmail,
 
     subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary_name + ',  par ' + providerName + ' le ' + date,
 
@@ -305,7 +305,6 @@ function sendMailToLaccorderie(
   beneficiary_email,
   providerName,
   providerEmail,
-  provider,
   description,
   hours,
   minutes,
@@ -346,7 +345,6 @@ function sendMailTest(
   beneficiary_email,
   providerName,
   providerEmail,
-  provider,
   description,
   hours,
   minutes,
