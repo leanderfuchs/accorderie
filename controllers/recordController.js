@@ -28,7 +28,6 @@ client.connect(err => {
 })
 
 exports.addRecordController = function (req, res) {
-  console.log(res);
 
   const errors = validationResult(req);
   
@@ -230,8 +229,6 @@ function sendMailToBeneficiary(
   category,
   sub_category
 ) {
-  console.log('Sending email to beneficiary');
-
   const transport = nodemailer.createTransport(mailjetTransport({
     auth: {
       apiKey: process.env.MAILJETAPIKEY,
@@ -239,7 +236,7 @@ function sendMailToBeneficiary(
     }
   }));
   const mail = {
-    from: process.env.EMAIL_ACCORDERIE,
+    from: process.env.EMAILACCODERIE,
     to: beneficiary_email,
     subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary_name + ',  par ' + providerName + ' le ' + date,
 
@@ -247,7 +244,9 @@ function sendMailToBeneficiary(
   };
 
   try {
-    const info = transport.sendMail(mail);
+    transport.sendMail(mail);
+    console.log('email sent to ' + beneficiary_email);
+
   } catch (err) {
     console.error(err);
 
@@ -263,15 +262,12 @@ function sendMailToProvider(
   beneficiary_email,
   providerName,
   providerEmail,
-  provider,
   description,
   hours,
   minutes,
   category,
   sub_category
 ) {
-  console.log('Sending email to provider');
-
   const transport = nodemailer.createTransport(mailjetTransport({
     auth: {
       apiKey: process.env.MAILJETAPIKEY,
@@ -279,7 +275,7 @@ function sendMailToProvider(
     }
   }));
   const mail = {
-    from: process.env.EMAIL_ACCORDERIE,
+    from: process.env.EMAILACCODERIE,
     to: providerEmail,
 
     subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary_name + ',  par ' + providerName + ' le ' + date,
@@ -288,7 +284,8 @@ function sendMailToProvider(
   };
 
   try {
-    const info = transport.sendMail(mail);
+    transport.sendMail(mail);
+    console.log('email sent to ' + providerEmail);
   } catch (err) {
     console.error(err);
 
@@ -311,7 +308,6 @@ function sendMailToLaccorderie(
   category,
   sub_category
 ) {
-  console.log('Sending email to l\'accorderie');
 
   const transport = nodemailer.createTransport(mailjetTransport({
     auth: {
@@ -320,15 +316,16 @@ function sendMailToLaccorderie(
     }
   }));
   const mail = {
-    from: process.env.EMAIL_ACCORDERIE,
-    to: process.env.EMAIL_ACCORDERIE,
+    from: process.env.EMAILACCODERIE,
+    to: process.env.EMAILACCODERIE,
     subject: 'Nouvel enregistrement d\'un chèque temps : à ' + beneficiary_name + ' par ' + providerName + ' le ' + date,
 
     html: '<p>Bonjour,</p><p>Un nouveau chèque temps de <b>' + beneficiary_name + ' ' + beneficiary_email + '</b> rendu par <b>' + providerName + ' ' + providerEmail + '</b> ,</p> <p>Categorie:' + category + ' - ' + sub_category + ' </p>  <p> pour le service: <p><b>"' + description + '"</b></p>, le <b>' + date + '</b>, dont la durée est de <b>' + hours + 'h. ' + minutes + 'min.</b></p></b></p></br></br></br><p><a target="_blank" href="https://accorderie-des-bauges.up.railway.app/">Page d\'ajout de cheque temps</a></p>'
   };
 
   try {
-    const info = transport.sendMail(mail);
+    transport.sendMail(mail);
+    console.log('email sent to ' + process.env.EMAILACCODERIE );
   } catch (err) {
 
     console.error(err);
@@ -351,7 +348,6 @@ function sendMailTest(
   category,
   sub_category
 ) {
-  console.log('Sending email to tester');
 
   const transport = nodemailer.createTransport(mailjetTransport({
     auth: {
@@ -368,9 +364,10 @@ function sendMailTest(
   };
 
   try {
-    const info = transport.sendMail(mail);
+    transport.sendMail(mail);
+    console.log('email sent to ' + process.env.EMAIL_TEST );
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
 
     return res.render('index', {
       msg: 'Erreur de serveur email. Test message'
